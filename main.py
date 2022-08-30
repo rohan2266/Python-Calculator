@@ -1,6 +1,9 @@
 from tkinter import *
 import math
+from pygame import mixer
+import speech_recognition
 
+mixer.init()
 
 def click(value):
     ex = entryField.get()  # 789 ex[0:len(ex)-1]
@@ -92,14 +95,93 @@ def click(value):
     except SyntaxError:
         pass
 
+def add(a,b):
+    return a+b
+def sub(a,b):
+    return a-b
+
+def mul(a, b):
+    return a * b
+def div(a, b):
+    return a / b
+
+def mod(a, b):
+    return a % b
+
+def lcm(a,b):
+    l=math.lcm(a,b)
+    return l
+
+def hcf(a,b):
+    h=math.gcd(a,b)
+    return h
+
+
+
+operations={'ADD':add,'ADDITION':add,'SUM':add,'PLUS':add,
+            'SUBTRACTION':sub , 'DIFFERENCE':sub , 'MINUS':sub , 'SUBTRACT':sub,
+            'PRODUCT': mul, 'MULTIPLICATION': mul,'MULTIPLY': mul,
+            'DIVISION': div, 'DIV': div, 'DIVIDE': div,
+            'LCM':lcm , 'HCF':hcf,
+            'MOD':mod ,'REMAINDER':mod , 'MODULUS':mod }
+
+
+def findNumbers(t):
+    l=[]
+    for num in t:
+        try:
+            l.append(int(num))
+        except ValueError:
+            pass
+    return l
+
+
+def audio():
+    mixer.music.load('music1.mp3')
+    mixer.music.play()
+    sr = speech_recognition.Recognizer()
+    with speech_recognition.Microphone()as m:
+        try:
+            sr.adjust_for_ambient_noise(m, duration=0.2)
+            voice=sr.listen(m)
+            text=sr.recognize.google(voice)
+            
+            mixer.music.load('music2.mp3')
+            mixer.music.play()
+            text_list=text.split(' ')
+            for word in text_list:
+                if word.upper() in operations.keys():
+                    l=findNumbers(text_list)
+                    print(l)
+                    result=operations[word.upper()](l[0],l[1]) #mul(5.0,6.0)
+                    entryField.delete(0,END)
+                    entryField.insert(END,result)
+
+                else:
+                    pass
+
+        except:
+            pass
+
+
+
 
 root = Tk()
 root.title('Smart Calculator')
 root.config(bg='black')
 root.geometry('680x486+100+100')
 
+logoImage = PhotoImage(file='logo.png')
+logoLabel = Label(root, image=logoImage, bg='black')
+logoLabel.grid(row=0, column=0)
+
 entryField = Entry(root, font=('arial', 20, 'bold'), bg='gray', fg='white', bd=10, relief=SUNKEN, width=40)
 entryField.grid(row=0, column=0, columnspan=8)
+
+micImage = PhotoImage(file='microphone.png')
+micButton = Button(root, image=micImage, bd=0, bg='black', activebackground='dodgerblue3'
+                   ,command=audio)
+micButton.grid(row=0, column=7)
 
 button_text_list = ["C", "CE", "√", "+", "π", "cosθ", "tanθ", "sinθ",
                     "1", "2", "3", "-", "2π", "cosh", "tanh", "sinh",
